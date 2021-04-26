@@ -1,17 +1,17 @@
-# Webroot
+# Charter
 
-This is an assignment for Charter.
+This is an assignment for Charter. Goal of the assignment is to create an application will perform the following logic -
 
-Goal :- 
 - A customer receives 2 points for every dollar spent over $100 in each transaction, plus 1 point for every dollar spent over $50 in each transaction
 (e.g. a $120 purchase = 2x$20 + 1x$50 = 90 points).
 - Given a record of every transaction during a three month period, calculate the reward points earned for each customer per month and total.
 - Make up a data set to best demonstrate your solution
-- Check solution into GitHub, and send me a link to your project repo
+
 
 ## History
 
 4/26/2021  1.0.0   Started work. Created Git repository
+4/26/2021  1.1.0   Created Point calculator Service
 
 ## Technology Highlights -
 
@@ -39,7 +39,7 @@ gradlew eclipse  - Set up Eclipse environment.
 
 gradlew bootRun  - Spin up a Tomcat server for the service. 
 
-gradlew bootJar - Create a FAT JAR in Y:\MyStuff\Builds\<project_name>\libs directory. 
+gradlew bootJar - Create a FAT JAR in C:\Temp\Builds\charter\libs directory. 
 >This JAR will have embedded app server
 
 ## application.yml
@@ -76,11 +76,11 @@ Start up using "gradlew bootRun".
 
 Right-Click on application and run as Spring Boot App
 On Run-Configuration, add these VM arguments - 
->-DLOG4J_LEVEL=info -DLOG4J_PATH=Y:/MyStuff/Logs/<project_name> -Dspring.profiles.active=desktop
+>-DLOG4J_LEVEL=info -DLOG4J_PATH=C:/Temp/Logs/charter -Dspring.profiles.active=desktop
 
 ### To Run the Fat Jar (Created by gradlew bootJar)
 
-java -DLOG4J_LEVEL=info -DLOG4J_PATH=Y:/MyStuff/Logs/<project_name> -Dspring.profiles.active=<profile> -jar <projectName>-?.?.?.jar   
+java -DLOG4J_LEVEL=info -DLOG4J_PATH=C:/Temp/Logs/charter -Dspring.profiles.active=<profile> -jar <projectName>-?.?.?.jar   
 *where profile is the spring profile from application.yml*  
 Note - System properties (-D) must be supplied before the JAR file on this command line.
 
@@ -118,6 +118,7 @@ Port and Context-Path (/) are in application.yml for each env
 
 http://localhost:8080/rest/basic/hello?name=Eldho : Basic REST service (Doesn't read from any DB) 
 http://localhost:8080/rest/db/getBranchName?branchId=B001 : Reads branch name from H2 database (Requires H2 DB set up above).  
+http://localhost:8080/rest/points/calculatePointsForPurchase?purchaseAmount=200.00 : Calculate points for a purchase amount
 
 ### MVC Controller
 
