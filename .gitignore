@@ -1,0 +1,12 @@
+*.classpath
+*.project
+*.bin
+.gradle
+.settings
+.git
+bin
+target
+build
+*.class
+~*.docx
+~*.tmp

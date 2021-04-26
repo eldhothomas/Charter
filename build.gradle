@@ -1,0 +1,188 @@
+apply plugin: 'java'
+
+//Eclipse 
+apply plugin: 'eclipse'
+//Eclipse Web Tools Platform - Needed for creating Web Std tools (WST) settings in .settings directory
+apply plugin: 'eclipse-wtp'
+
+//Spring Boot
+apply plugin: 'org.springframework.boot'
+// Needed to resolve dependencies with version number not specified
+apply plugin: 'io.spring.dependency-management'
+
+//If buildDir is not specified, $projectDir/build is used
+buildDir = "C:/Temp/Builds/${project.name}"
+version = project.property('appVersion')
+javaVersion = project.property('javaVersion')
+springBootVersion = project.property('springBootVersion')
+
+sourceCompatibility = "$javaVersion"
+targetCompatibility = "$javaVersion"
+
+defaultTasks 'bootJar'
+
+repositories {
+    jcenter()
+}
+
+buildscript {
+	//ext {
+	//	springBootVersion = project.property('springBootVersion')
+	//}
+    repositories {
+        jcenter()
+    }
+    dependencies {
+	    classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.7.2")
+    }
+}
+
+sourceSets {
+   main {
+   }
+}
+ 
+task printVariables() {
+   doLast {
+      println "projectDir: $projectDir"
+      println "buildDir: $buildDir"
+      println "project.name: $project.name"
+      println "appVersion: $version"
+      println "javaVersion: $javaVersion"
+      println "springBootVersion: $springBootVersion"
+      println "springProfilesActive: desktop"
+   }
+}
+
+tasks['compileJava'].dependsOn("printVariables")
+tasks['eclipse'].dependsOn ("printVariables")
+
+processResources {
+   //This will replace all ${..} tokens in the application.properties with gradle's project properties
+   filesMatching("**/application.properties") {
+      expand( project.properties )
+   }
+}
+
+eclipse {
+
+   //Manage entries in .classpath
+   classpath {
+      file {
+         whenMerged {
+            entries.removeAll {
+               //Remove the JRE_CONTAINER added by eclipse target because that points to the one corresponding to JAVA_HOME
+               it.kind == 'con' && it.@path.startsWith('org.eclipse.jdt.launching.JRE_CONTAINER')
+            }
+         }
+      
+         withXml { xml ->
+            def node = xml.asNode()
+		    //Add Workspace default JRE
+            node.appendNode( 'classpathentry', [ kind: 'con', path: 'org.eclipse.jdt.launching.JRE_CONTAINER'])
+         }
+      } 
+   }
+
+   //Manage entries in .settings/org.eclipse.jdt.core.prefs
+   //JDT = Java Development Tools
+   jdt.file.withProperties { props ->
+       props.put('org.eclipse.jdt.core.compiler.codegen.targetPlatform', "$javaVersion".toString())
+       props.put('org.eclipse.jdt.core.compiler.source', "$javaVersion".toString())
+       props.put('org.eclipse.jdt.core.compiler.compliance', "$javaVersion".toString())
+   }
+
+   //Manage entries in .settings/org.eclipse.wst.common.project.facet.core.xml
+   //WST = Web Standard Tools
+   //WTP = Web Tools Platform
+   wtp {
+       facet {
+           facet name: 'jst.java', version: "$javaVersion".toString()
+
+           file {
+               whenMerged { 
+                   wtpFacet -> wtpFacet.facets.removeAll { 
+                       entry -> entry.name == 'jst.java' && entry.version != "$javaVersion".toString()
+                   }
+               }
+           }  
+       }
+   }
+   
+}
+
+compileJava {
+    options.compilerArgs << '-Xlint:deprecation' << '-Xlint:unchecked'
+}
+
+bootRun {
+	//System properties supplied at runtime. This will override application properties set through application.properties file.
+    //Note: These are not used while running in Eclipse (as Spring Boot App), they need to be supplied through Run Configurations
+	systemProperty 'spring.profiles.active', "desktop"
+	systemProperty 'LOG4J_PATH', "C:/Temp/Logs/charter"
+	systemProperty 'LOG4J_LEVEL', 'info'
+}
+
+configurations {
+	//This is excluded because we are using log4j2
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+}
+
+dependencies {
+
+	implementation("org.springframework.boot:spring-boot-starter-parent:${springBootVersion}")
+
+    //Includes web components. Pulls Tomcat by default, it is possible to pull Jetty or Undertow instead
+    implementation("org.springframework.boot:spring-boot-starter-web") 
+    
+    //Includes the Actuator. Endpoints are available under /actuator - /actuator/health, /actuator/info etc.
+    implementation("org.springframework.boot:spring-boot-starter-actuator") 
+
+    //Including this makes Spring Boot automatically use Thymeleaf (Templates are in src/main/resource/templates) 
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+
+	//Adding Spring Security will add a login screen.
+	//The default user id is "user" and password is given by spring.security.user.password (application.yml). 
+	//If password property is not specified, it is random generated during startup (visible on the SpringBoot console log - "Using generated security password") 
+    implementation("org.springframework.boot:spring-boot-starter-security")
+
+    //Note that spring-boot-starter-logging is excluded above. If not Spring Boot will use LogBack for logging. Here, I am over-riding that with log4j2
+    implementation("org.springframework.boot:spring-boot-starter-log4j2")
+
+    //Devtools installs a LiveReload server. With a browser plug-in (like RemoteLiveReload), browser can automatically refresh when resources change (not tested)
+    implementation("org.springframework.boot:spring-boot-devtools")
+
+    //Hibernate is automatically added as a dependency on spring-boot-starter-data-jpa  
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.hibernate:hibernate-jcache")
+    implementation("org.ehcache:ehcache")
+    implementation("javax.cache:cache-api")
+
+    //Spring Session Using Redis
+    //"org.springframework.boot:spring-boot-starter-data-redis" does not work with Spring Boot 2.1. Needs "spring-session-data-redis" 
+    implementation("org.springframework.session:spring-session-data-redis")
+    //"spring-session-data-redis" doesn't pull Jedis or Lettuce drivers, so we need the explicit dependency
+    implementation("redis.clients:jedis")
+    implementation("io.lettuce:lettuce-core")
+
+    runtimeOnly("org.webjars:bootstrap:4.2.1")
+    
+    //Adding this and adding the corresponding properties in applicatin.yml embeds an H2 database with the application
+    runtimeOnly("com.h2database:h2:1.4.199")
+
+    runtimeOnly("com.sun.xml.bind:jaxb-impl:2.3.2")
+    runtimeOnly("com.sun.xml.bind:jaxb-core:2.3.0.1")
+
+	implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'
+	implementation group: 'fr.opensagres.xdocreport', name: 'org.apache.poi.xwpf.converter.core', version: '1.0.4'
+	implementation group: 'fr.opensagres.xdocreport', name: 'org.apache.poi.xwpf.converter.xhtml', version: '1.0.4'
+	
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.3.2'
+	implementation group: 'commons-io', name: 'commons-io', version: '2.2'
+
+}

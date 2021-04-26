@@ -1,0 +1,109 @@
+name: HP-20201127-YAML for Webroot
+environment: HP-20201127
+
+welcome.message: Eldho Thomas
+
+servers:
+    - www.abc.com
+    - www.xyz.com
+
+server:
+    port: 80
+    address: 
+    servlet:
+      context-path: /
+      session:
+        timeout: 99
+
+management:
+  endpoint:
+    health:
+      show-details: when-authorized
+  endpoints:
+    web:
+      base-path: /admin
+
+spring:
+  profiles: HP-20201127
+
+  session:
+    store-type: redis
+
+    redis:
+      flush-mode: on-save
+      namespace: spring:session
+      #Default is every minute (0 * * * * *); Changed to every 30 minute
+      cleanup-cron: 0 */30 * * * *
+
+  redis:
+    host: localhost
+    password: 
+    port: 6379
+    database: 0
+
+  data:
+    redis:
+      repositories:
+        #This is added to suppress a message - "Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.eldho.charter.repo01.repo.BranchRepository." 
+        enabled: false
+
+  security:
+    user:
+      password: password
+
+  h2:
+     console:
+        enabled: true
+        path: /h2-console # Make sure you use JDBC URL below
+        settings:
+          #This is needed to allow console operation from remote
+          web-allow-others: true
+
+  datasource:
+    db01:
+      jdbcUrl: jdbc:h2:mem:testdb    #In-memory database. Use jdbc:h2:~testdb for file-based db. Created under c:\Users\<id>
+      username: SA
+      password:
+      driverClassName: org.h2.Driver
+      defaultSchema:
+      maxPoolSize: 10
+      hibernate:
+         hbm2ddl.method: create-drop
+         show_sql: true
+         format_sql: true
+         dialect: org.hibernate.dialect.H2Dialect 
+         
+    db02:
+      jdbcUrl: jdbc:postgresql://localhost:5432/postgres
+      username: postgres
+      password: super
+
+  jpa:
+    database-platform: org.hibernate.dialect.Oracle10gDialect
+    hibernate:
+      naming-strategy: org.hibernate.cfg.DefaultNamingStrategy
+    show-sql: true
+    properties:
+      hibernate:
+        format.sql: true
+        id.new_generator_mapping: false
+        dialect: org.hibernate.dialect.MySQLDialect      
+        generate_statistics: true
+        session.events.log: false
+        javax.cache:
+          provider: org.ehcache.jsr107.EhcacheCachingProvider
+          uri: classpath:ehcache.xml
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          use_minimal_puts: false
+          region.factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+        enable_lazy_load_no_trans: true
+        jdbc:
+          lob:
+            non_contextual_creation: true        
+      net.sf.ehcache.configurationResourceName: ehcache.xml
+
+  cache:
+    jcache:
+      config: classpath:ehcache.xml
