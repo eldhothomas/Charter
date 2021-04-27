@@ -8,13 +8,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.eldho.charter.controller.rest.RestBasicController;
 
 @Controller
 @RequestMapping("/mvc/vue")
 public class MvcVueTestController {
 
-    private static final Logger logger = LogManager.getLogger(RestBasicController.class);
+    private static final Logger logger = LogManager.getLogger(MvcVueTestController.class);
 
     @RequestMapping(method=RequestMethod.GET, value="/test")
     public String index(Model model) {

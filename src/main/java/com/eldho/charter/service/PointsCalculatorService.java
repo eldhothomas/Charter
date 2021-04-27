@@ -1,7 +1,6 @@
 package com.eldho.charter.service;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.logging.log4j.Level;
@@ -30,11 +29,10 @@ public class PointsCalculatorService {
 	 */
 	public Integer calculatePointsForCustomer(String customerId) {
 		Integer totalPoints = 0;
-		
+
 		List<TransactionsEntity> txns = db01Service.getTransactionsForCustomer(customerId);
-		Iterator<TransactionsEntity> iter = txns.iterator();
-		while (iter.hasNext()) {
-			TransactionsEntity txnEntity = iter.next();
+
+		for (TransactionsEntity txnEntity : txns) {
 			logger.log(Level.INFO, "Transaction - Customer: {}, Txn Amount: {}", txnEntity.getCustomerId(), txnEntity.getPurchaseAmount());
 			Integer txnPoints = calculatePointsForTransaction(txnEntity.getPurchaseAmount());
 			totalPoints = totalPoints + txnPoints;
@@ -61,6 +59,7 @@ public class PointsCalculatorService {
 		BigDecimal limit2 = new BigDecimal(50);
 
 		Integer points = 0;
+		logger.log(Level.INFO, "Purchase Amount: {}", purchaseAmount);
 		if (purchaseAmount.compareTo(limit1) > 0) {
 			logger.log(Level.INFO, "Greater than {}", limit1);
 			BigDecimal overLimit1 = purchaseAmount.subtract(limit1);

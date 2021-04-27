@@ -14,6 +14,8 @@ public class TransactionsEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
+    @Column(name = "TXN_ID")
+    private String txnId;
     @Column(name = "CUSTOMER_ID")
     private String customerId;
     @Column(name = "PURCHASE_AMOUNT")
@@ -30,6 +32,12 @@ public class TransactionsEntity implements Serializable {
 	}
 	public void setPurchaseAmount(BigDecimal purchaseAmount) {
 		this.purchaseAmount = purchaseAmount;
+	}
+	public String getTxnId() {
+		return txnId;
+	}
+	public void setTxnId(String txnId) {
+		this.txnId = txnId;
 	}
 
 }

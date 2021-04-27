@@ -7,6 +7,12 @@ This is an assignment for Charter. Goal of the assignment is to create an applic
 - Given a record of every transaction during a three month period, calculate the reward points earned for each customer per month and total.
 - Make up a data set to best demonstrate your solution
 
+## Broad Steps to run (see below for details) - 
+
+- Spin up using "gradlew bootRun"
+- Go to H2 console; Create table; Insert transaction records.
+- Invoke the "calculatePointsForCustomer" REST endpoint.
+
 
 ## History
 
@@ -25,6 +31,7 @@ This is an assignment for Charter. Goal of the assignment is to create an applic
 - Creates Boot Jar (build target - bootJar)
 - Spring Session (MvcSessionController.java) - Uses Redis for caching
 - Redis (See configuration in application.properties / application.yml).
+  Currently, disabled. If needed, change store-type to "redis" and make sure Redis is running.
 - Spring Security [Password in appplication.yml]
     Log in screen pops up for web requests
     For /rest URL's, no login required (Configured in SecurityConfig.java)
@@ -70,7 +77,7 @@ Start Redis Server on WSL Ubuntu - "sudo service redis-server start"  (Password 
 
 ### To Run on Command Prompt
 
-Start up using "gradlew bootRun".
+Start up using "gradlew bootRun". All environment variables are set in build.gradle.
 
 ### To Run in STS/Eclipse
 
@@ -96,25 +103,22 @@ http://localhost:8080/h2-console  (See SQL above)
 
 Run this SQL -
 
-    CREATE TABLE BRANCH
-    (ID   VARCHAR2(5),
-    NAME    VARCHAR2(30));
+    DROP TABLE TRANSACTIONS;
 
-    INSERT INTO BRANCH (ID, NAME) values ('B001', 'Branch 001');
-    
     CREATE TABLE TRANSACTIONS
-    (CUSTOMER_ID      VARCHAR2(5),
+    (TXN_ID           INTEGER,
+     CUSTOMER_ID      VARCHAR2(5),
      PURCHASE_AMOUNT  DECIMAL);
-     
-    INSERT INTO TRANSACTIONS (CUSTOMER_ID, PURCHASE_AMOUNT) values ('C001', 220.00);
 
-### To Verify Caching:-
+    INSERT INTO TRANSACTIONS (TXN_ID, CUSTOMER_ID, PURCHASE_AMOUNT) values (1, 'C001', 220.00);
+    INSERT INTO TRANSACTIONS (TXN_ID, CUSTOMER_ID, PURCHASE_AMOUNT) values (2, 'C001', 1000.00);
+    INSERT INTO TRANSACTIONS (TXN_ID, CUSTOMER_ID, PURCHASE_AMOUNT) values (3, 'C001', 2200.00);
+    INSERT INTO TRANSACTIONS (TXN_ID, CUSTOMER_ID, PURCHASE_AMOUNT) values (4, 'C001', 75.00);
+    INSERT INTO TRANSACTIONS (TXN_ID, CUSTOMER_ID, PURCHASE_AMOUNT) values (5, 'C002', 110.00);
+    INSERT INTO TRANSACTIONS (TXN_ID, CUSTOMER_ID, PURCHASE_AMOUNT) values (6, 'C002', 320.00);
+    INSERT INTO TRANSACTIONS (TXN_ID, CUSTOMER_ID, PURCHASE_AMOUNT) values (7, 'C002', 520.00);
+    INSERT INTO TRANSACTIONS (TXN_ID, CUSTOMER_ID, PURCHASE_AMOUNT) values (8, 'C002', 820.00);
 
-Look for these log entres (it means the entity was read from database) - 
-    Received request for Branch. BranchId: B001
-    Reading from database (not cache)
-
-Subsequent requests for the same branch will read from cache and you won't see the 2nd log entry above.
 
 ## Service Endpoints and operations
 
@@ -122,8 +126,6 @@ Port and Context-Path (/) are in application.yml for each env
 
 ### REST Controllers
 
-http://localhost:8080/rest/basic/hello?name=Eldho : Basic REST service (Doesn't read from any DB) 
-http://localhost:8080/rest/db/getBranchName?branchId=B001 : Reads branch name from H2 database (Requires H2 DB set up above).  
 http://localhost:8080/rest/points/calculatePointsForPurchase?purchaseAmount=200.00 : Calculate points for a purchase amount
 http://localhost:8080/rest/points/calculatePointsForCustomer?customerId=C001 : Calculate and add up points for a customer
 
