@@ -22,10 +22,19 @@ public class RestPointsController {
     private PointsCalculatorService pointsCalculatorService;
 
     @RequestMapping("/calculatePointsForPurchase")
-    public ResponseEntity<Integer> getBranchName(@RequestParam(value = "purchaseAmount", defaultValue = "200.50") BigDecimal purchaseAmount) {
-    	logger.log(Level.INFO, "Received request to calculate purchase amount. Purchase amount: {}", purchaseAmount);
-    	Integer points = pointsCalculatorService.calculatePoints(purchaseAmount);
+    public ResponseEntity<Integer> calculatePointsForPurchase(@RequestParam(value = "purchaseAmount", defaultValue = "200.50") BigDecimal purchaseAmount) {
+    	logger.log(Level.INFO, "Received request to calculate points for purchase amount: {}", purchaseAmount);
+    	Integer points = pointsCalculatorService.calculatePointsForTransaction(purchaseAmount);
     	logger.log(Level.INFO, "Calculated points: {}", points);
         return new ResponseEntity<Integer>(points, HttpStatus.OK);
     }
+
+    @RequestMapping("/calculatePointsForCustomer")
+    public ResponseEntity<Integer> calculatePointsForCustomer(@RequestParam(value = "customerId", defaultValue = "CCCC") String customerId) {
+    	logger.log(Level.INFO, "Received request to calculate points for customer {}", customerId);
+    	Integer points = pointsCalculatorService.calculatePointsForCustomer(customerId);
+    	logger.log(Level.INFO, "Calculated points: {}", points);
+        return new ResponseEntity<Integer>(points, HttpStatus.OK);
+    }
+    
 }

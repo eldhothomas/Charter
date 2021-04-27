@@ -101,6 +101,12 @@ Run this SQL -
     NAME    VARCHAR2(30));
 
     INSERT INTO BRANCH (ID, NAME) values ('B001', 'Branch 001');
+    
+    CREATE TABLE TRANSACTIONS
+    (CUSTOMER_ID      VARCHAR2(5),
+     PURCHASE_AMOUNT  DECIMAL);
+     
+    INSERT INTO TRANSACTIONS (CUSTOMER_ID, PURCHASE_AMOUNT) values ('C001', 220.00);
 
 ### To Verify Caching:-
 
@@ -119,6 +125,7 @@ Port and Context-Path (/) are in application.yml for each env
 http://localhost:8080/rest/basic/hello?name=Eldho : Basic REST service (Doesn't read from any DB) 
 http://localhost:8080/rest/db/getBranchName?branchId=B001 : Reads branch name from H2 database (Requires H2 DB set up above).  
 http://localhost:8080/rest/points/calculatePointsForPurchase?purchaseAmount=200.00 : Calculate points for a purchase amount
+http://localhost:8080/rest/points/calculatePointsForCustomer?customerId=C001 : Calculate and add up points for a customer
 
 ### MVC Controller
 

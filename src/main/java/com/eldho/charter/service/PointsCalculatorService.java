@@ -1,15 +1,48 @@
 package com.eldho.charter.service;
 
 import java.math.BigDecimal;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.eldho.charter.repo01.Db01Service;
+import com.eldho.charter.repo01.entity.TransactionsEntity;
 
 @Service
 public class PointsCalculatorService {
 
 	private static final Logger logger = LogManager.getLogger(PointsCalculatorService.class);
+
+	@Autowired
+    private Db01Service db01Service;
+
+	/**
+	 * This method will scan through all the purchase transactions for the customer and add them up to get the total 
+	 * points. In real world, this would be more elaborate - we may want to add a range of dates etc.  
+	 * 
+	 * @param customerId
+	 * @return
+	 */
+	public Integer calculatePointsForCustomer(String customerId) {
+		Integer totalPoints = 0;
+		
+		List<TransactionsEntity> txns = db01Service.getTransactionsForCustomer(customerId);
+		Iterator<TransactionsEntity> iter = txns.iterator();
+		while (iter.hasNext()) {
+			TransactionsEntity txnEntity = iter.next();
+			logger.log(Level.INFO, "Transaction - Customer: {}, Txn Amount: {}", txnEntity.getCustomerId(), txnEntity.getPurchaseAmount());
+			Integer txnPoints = calculatePointsForTransaction(txnEntity.getPurchaseAmount());
+			totalPoints = totalPoints + txnPoints;
+			logger.log(Level.INFO, "Points for this transaction: {}; Total points now: {}", txnPoints, totalPoints);
+		}
+
+		return totalPoints;
+	}
 
 	/**
 	 * A customer receives 2 points for every dollar spent over $100 in each
@@ -21,7 +54,7 @@ public class PointsCalculatorService {
 	 * @param purchaseAmount
 	 * @return
 	 */
-	public Integer calculatePoints(BigDecimal purchaseAmount) {
+	public Integer calculatePointsForTransaction(BigDecimal purchaseAmount) {
 
 		//With some work, these can be configured in the database as global properties instead of hard-coding
 		BigDecimal limit1 = new BigDecimal(100);
