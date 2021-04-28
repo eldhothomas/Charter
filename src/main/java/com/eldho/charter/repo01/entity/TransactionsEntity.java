@@ -8,6 +8,14 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+
+/** 
+ * Entity representation of TRANSACTIONS table
+ * 
+ * @author Eldho Thomas
+ *
+ */
+
 @Entity
 @Table(name = "TRANSACTIONS")
 public class TransactionsEntity implements Serializable {

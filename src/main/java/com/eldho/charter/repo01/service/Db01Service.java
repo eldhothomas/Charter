@@ -1,4 +1,4 @@
-package com.eldho.charter.repo01;
+package com.eldho.charter.repo01.service;
 
 import java.util.List;
 
@@ -19,6 +19,12 @@ public class Db01Service {
 
     private static final Logger logger = LogManager.getLogger(Db01Service.class);
 
+    /**
+     * This method retrieves all the transactions for a customer
+     * 
+     * @param customerId
+     * @return
+     */
     @Transactional(value = "db01TransactionManager")
     public List<TransactionsEntity> getTransactionsForCustomer(String customerId) {
     	logger.info("Reading transactions from database for customer {}", customerId);

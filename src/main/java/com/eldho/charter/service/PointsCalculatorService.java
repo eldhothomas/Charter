@@ -9,9 +9,15 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.eldho.charter.repo01.Db01Service;
 import com.eldho.charter.repo01.entity.TransactionsEntity;
+import com.eldho.charter.repo01.service.Db01Service;
 
+/**
+ * Business Service for our Points calculator
+ * 
+ * @author Eldho Thomas
+ *
+ */
 @Service
 public class PointsCalculatorService {
 

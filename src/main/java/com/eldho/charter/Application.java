@@ -10,7 +10,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
 
-//This is required for the booTrun task for Gradle
+//This is required for the bootRun task for Gradle
 //@SpringBootApplication annotation adds all the following - 
 //@Configuration tags the class as a source of bean definitions for the application context.
 //@EnableAutoConfiguration tells Spring Boot to start adding beans basd on classpath settings, other beans and various property settings

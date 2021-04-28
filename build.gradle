@@ -113,7 +113,17 @@ eclipse {
 }
 
 compileJava {
-    options.compilerArgs << '-Xlint:deprecation' << '-Xlint:unchecked'
+   options.compilerArgs << '-Xlint:deprecation' << '-Xlint:unchecked'
+}
+
+test {
+   useJUnit()
+   testLogging {
+      events "passed", "skipped", "failed", "standardOut", "standardError"
+   }
+   beforeTest { descriptor ->
+      logger.lifecycle("Running test: ${descriptor}")
+   }
 }
 
 bootRun {
@@ -162,6 +172,8 @@ dependencies {
     implementation("org.hibernate:hibernate-jcache")
     implementation("org.ehcache:ehcache")
     implementation("javax.cache:cache-api")
+    
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     //Spring Session Using Redis
     //"org.springframework.boot:spring-boot-starter-data-redis" does not work with Spring Boot 2.1. Needs "spring-session-data-redis" 

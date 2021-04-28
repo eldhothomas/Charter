@@ -7,17 +7,28 @@ This is an assignment for Charter. Goal of the assignment is to create an applic
 - Given a record of every transaction during a three month period, calculate the reward points earned for each customer per month and total.
 - Make up a data set to best demonstrate your solution
 
+## Relevant notes about the solution
+
+- Receives a request on a REST API with the customer id for whom the points need to be added up. 
+- Reads all the transactions for the customer from a table (hosted in an in-memory H2 database).
+- For each transaction, calculate the points and add up for all transactions.
+- Return the total points to the requestor.
+
 ## Broad Steps to run (see below for details) - 
 
 - Spin up using "gradlew bootRun"
-- Go to H2 console; Create table; Insert transaction records.
+- Go to H2 console (http://localhost:8080/h2-console); Make sure JDBC URL is jdbc:h2:mem:testdb
+  - Create table; Insert transaction records (See SQLs below)
 - Invoke the "calculatePointsForCustomer" REST endpoint.
-
+  http://localhost:8080/rest/points/calculatePointsForCustomer?customerId=C001
 
 ## History
 
 4/26/2021  1.0.0   Started work. Created Git repository
 4/26/2021  1.1.0   Created Point calculator Service
+4/28/2021  1.2.0   Created REST endpoint; Added JUnit test 
+                   Note: Only one UT is created. Most other methods will require mocking of interfaces, that will involve more work.
+                   Did some refactoring
 
 ## Technology Highlights -
 
@@ -44,7 +55,7 @@ gradlew eclipse  - Set up Eclipse environment.
 >IMPORTANT - DO not import as General Project.
 >Import as Gradle Project into Spring TS. Add Gradle nature to project. 
 
-gradlew bootRun  - Spin up a Tomcat server for the service. 
+gradlew bootRun  - Spin up the application in a Tomcat server. 
 
 gradlew bootJar - Create a FAT JAR in C:\Temp\Builds\charter\libs directory. 
 >This JAR will have embedded app server
@@ -118,7 +129,6 @@ Run this SQL -
     INSERT INTO TRANSACTIONS (TXN_ID, CUSTOMER_ID, PURCHASE_AMOUNT) values (6, 'C002', 320.00);
     INSERT INTO TRANSACTIONS (TXN_ID, CUSTOMER_ID, PURCHASE_AMOUNT) values (7, 'C002', 520.00);
     INSERT INTO TRANSACTIONS (TXN_ID, CUSTOMER_ID, PURCHASE_AMOUNT) values (8, 'C002', 820.00);
-
 
 ## Service Endpoints and operations
 

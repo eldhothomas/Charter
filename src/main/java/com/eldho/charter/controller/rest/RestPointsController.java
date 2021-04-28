@@ -13,6 +13,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.eldho.charter.service.PointsCalculatorService;
 
+/**
+ * 
+ * @author Eldho Thomas
+ * 
+ * REST Controller for the Points API
+ *
+ */
+
+
 @RestController
 @RequestMapping("/rest/points")
 public class RestPointsController {
